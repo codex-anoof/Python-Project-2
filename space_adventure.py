@@ -1,4 +1,3 @@
-
 import pygame
 import sys
 import random
@@ -18,6 +17,7 @@ score = 0
 # Power-up logic
 power_up_active = False
 power_up_timer = 0
+power_up = None  # Properly initialized
 
 bullets = []
 enemies = [pygame.Rect(random.randint(0, WIDTH-50), 0, 50, 50) for _ in range(3)]
@@ -39,19 +39,17 @@ while running:
         lives -= 1
         pygame.time.delay(300)
 
-    # Keep player on screen (Issue #1 - previously fixed)
+    # Keep player on screen
     if player.left < 0:
         player.left = 0
     if player.right > WIDTH:
         player.right = WIDTH
 
-    # Power-up collection logic (Issue #3)
+    # Power-up collection logic (Fixed)
     if not power_up_active and random.random() < 0.01:
-        power_up = pygame.Rect(random.randint(0, WIDTH-20), random.randint(0, HEIGHT-20), 30, 30)
+        power_up = pygame.Rect(random.randint(0, WIDTH-30), random.randint(0, HEIGHT-30), 30, 30)
         power_up_active = True
         power_up_timer = pygame.time.get_ticks()
-    else:
-        power_up = None
 
     # Game logic
     screen.fill((0, 0, 30))
@@ -64,7 +62,7 @@ while running:
             bullets.remove(bullet)
         pygame.draw.rect(screen, (255, 255, 0), bullet)
 
-    # Enemies + destruction logic (Issue #4)
+    # Enemies + destruction logic
     for enemy in enemies[:]:
         enemy.y += 1
         pygame.draw.rect(screen, (255, 0, 0), enemy)
@@ -80,8 +78,9 @@ while running:
             pygame.draw.rect(screen, (0, 255, 255), power_up)
         else:
             power_up_active = False
+            power_up = None
 
-    # Game over logic (Issue #2)
+    # Game over logic
     if lives <= 0:
         font = pygame.font.SysFont(None, 48)
         game_over_text = font.render("Game Over", True, (255, 0, 0))
@@ -93,3 +92,5 @@ while running:
 
     pygame.display.flip()
     clock.tick(60)
+
+pygame.quit()
